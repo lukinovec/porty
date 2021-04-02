@@ -1,11 +1,11 @@
 @extends('template')
 @section('content')
-<div class="w-full p-2 flex-col flex justify-center items-center">
-    <a target="_blank" href="https://github.com/{{ $user["login"] }}" class="flex justify-center items-center">
-        <img src="{{ $user["avatar_url"] }}" class="w-12 h-12 rounded-full p-2" alt="users avatar">
-        <h1 class="font-extrabold text-2xl">{{ $user["login"] }}</h1>
+<div class="flex flex-col items-center justify-center w-full">
+    <a target="_blank" href="https://github.com/{{ $user["login"] }}" class="flex items-center justify-center w-full bg-gray-50">
+        <img src="{{ $user["avatar_url"] }}" class="w-12 h-12 p-2 rounded-full" alt="users avatar">
+        <h1 class="text-2xl font-extrabold">{{ $user["login"] }}</h1>
     </a>
-    <section>
+    <section class="p-2">
         @forelse ($projects as $project)
 
         @component('components.project', ["project" => $project])

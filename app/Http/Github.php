@@ -10,17 +10,22 @@ class Github {
     }
 
     private function get($endpoint) {
-        $private_access_token = getenv("GITHUB_PERSONAL_ACCESS_TOKEN");
-        return Http::get($endpoint, [
-            "authorization" => "token $private_access_token"
-        ])->json();
+        return Http::withToken(getenv("GITHUB_PERSONAL_ACCESS_TOKEN"))->get($endpoint)->json();
     }
 
     public function user() {
         return $this->get("https://api.github.com/users/$this->name");
     }
 
+    public function projectPictures($project_name)
+    {
+        return $this->get("https://api.github.com/repos/$this->name/$project_name/contents/porty_pictures");
+    }
+
     public function projects() {
-        return $this->get("https://api.github.com/users/$this->name/repos");
+        return collect($this->get("https://api.github.com/users/$this->name/repos"))->map(function($project) {
+            $project["pictures"] = isset($this->projectPictures($project["name"])["message"]) ? [] : $this->projectPictures($project["name"]);
+            return $project;
+        });
     }
 }
