@@ -3,7 +3,6 @@
 namespace App\Http;
 
 use Illuminate\Support\Facades\Http;
-use Laravel\Socialite\Facades\Socialite;
 
 class Github {
     public $user;
@@ -12,19 +11,8 @@ class Github {
     }
 
     private function get($endpoint) {
-        return Http::withToken(getenv("GITHUB_PERSONAL_ACCESS_TOKEN"))->get($endpoint)->json();
+        return Http::withToken($this->user->token)->get($endpoint)->json();
     }
-
-    // public function user() {
-    //     $response = $this->get("https://api.github.com/users/$this->name");
-    //     if(isset($response["message"])) {
-    //         return abort(404, "User not found");
-    //     } else {
-    //         $user = Socialite::driver('github')->user();
-    //         dd($user);
-    //         return $response;
-    //     }
-    // }
 
     public function projectPictures($project_name)
     {
@@ -32,7 +20,7 @@ class Github {
     }
 
     public function projects() {
-        return collect($this->get("https://api.github.com/users/{$this->user->nickname}/repos"))->map(function($project) {
+        return collect($this->get($this->user->user["repos_url"]))->map(function($project) {
             $project["pictures"] = isset($this->projectPictures($project["name"])["message"]) ? [] : $this->projectPictures($project["name"]);
             return $project;
         });

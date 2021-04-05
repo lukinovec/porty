@@ -1,6 +1,9 @@
 <?php
 
+use Illuminate\Http\Client\Response;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Cookie;
 use App\Http\Controllers\HomeController;
 use Laravel\Socialite\Facades\Socialite;
 use App\Http\Controllers\WelcomeController;
@@ -16,11 +19,19 @@ use App\Http\Controllers\WelcomeController;
 */
 Route::get('/', [WelcomeController::class, 'index']);
 Route::get('/portfolio', [HomeController::class, 'show']);
+Route::get('/download/css', function () {
+    return response()->download(public_path("css/app.css"));
+});
 
 Route::get('/auth/redirect', function () {
+    if(request()->cookie("github_user")) {
+        return redirect('/portfolio')->with('github_user', unserialize(request()->cookie("github_user")));
+    }
     return Socialite::driver('github')->redirect();
 });
 
 Route::get('/auth/callback', function () {
-    return redirect('/portfolio')->with('github_user', Socialite::driver('github')->user());
+    $user = Socialite::driver('github')->user();
+    Cookie::queue(Cookie::make('github_user', serialize($user), 10));
+    return redirect('/portfolio')->with('github_user', $user);
 });
