@@ -20,9 +20,16 @@ class Github {
     }
 
     public function projects() {
-        return collect($this->get($this->user->user["repos_url"]))->map(function($project) {
+        if(cache("{$this->user->nickname}_projects")) {
+            return cache("{$this->user->nickname}_projects");
+        }
+
+        $projects = collect($this->get($this->user->user["repos_url"]))->map(function($project) {
             $project["pictures"] = isset($this->projectPictures($project["name"])["message"]) ? [] : $this->projectPictures($project["name"]);
             return $project;
         });
+
+        cache(["{$this->user->nickname}_projects" => $projects]);
+        return $projects;
     }
 }

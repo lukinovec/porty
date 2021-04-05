@@ -22,6 +22,15 @@ Route::get('/portfolio', [HomeController::class, 'show']);
 Route::get('/download/css', function () {
     return response()->download(public_path("css/app.css"));
 });
+// Route::get('/download', function () {
+//     $zip = new ZipArchive;
+//     $zip->open('portfolio.zip', ZipArchive::CREATE);
+//     foreach (['index.html', 'app.css'] as $file) {
+//       $zip->addFile($file);
+//     }
+//     $zip->close();
+//     return response()->download(public_path("css/app.css"));
+// });
 
 Route::get('/auth/redirect', function () {
     if(request()->cookie("github_user")) {
