@@ -8,7 +8,7 @@
         </a>
         <x-html />
     </section>
-    <section class="p-2">
+    <section class="p-2 sm:w-1/2">
         @forelse ($projects as $project)
 
         @component('components.project', ["project" => $project])
