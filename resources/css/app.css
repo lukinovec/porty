@@ -1,3 +1,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+    .btn {
+        @apply m-2 p-2 text-xl font-semibold transition duration-500 ease-in-out delay-75 transform border-2 border-black hover:scale-125 rounded-xl
+    }
+
+    .flex-center {
+        @apply flex items-center justify-center
+    }
+}

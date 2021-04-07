@@ -23,14 +23,16 @@
             }
         </style>
         <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
+        @livewireStyles
     </head>
-    <body class="w-full h-full">
-        @yield('content')
-        <script src="https://unpkg.com/embla-carousel/embla-carousel.umd.js"></script>
+    <body class="flex flex-col items-center w-full h-full">
+            @yield('content')
+        {{-- <script src="https://unpkg.com/embla-carousel/embla-carousel.umd.js"></script>
         <script type="text/javascript">
           var emblaNode = document.querySelector('.embla')
           var options = { loop: false }
           var embla = EmblaCarousel(emblaNode, options)
-        </script>
+        </script> --}}
+        @livewireScripts
     </body>
 </html>

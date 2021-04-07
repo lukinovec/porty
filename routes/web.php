@@ -1,12 +1,11 @@
 <?php
 
-use Illuminate\Http\Client\Response;
-use Illuminate\Support\Facades\Cache;
+use App\Http\Livewire\Auth;
+use App\Http\Livewire\Home;
+use App\Http\Livewire\Welcome;
+use App\Http\Livewire\Generate;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Cookie;
-use App\Http\Controllers\HomeController;
-use Laravel\Socialite\Facades\Socialite;
-use App\Http\Controllers\WelcomeController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -17,30 +16,16 @@ use App\Http\Controllers\WelcomeController;
 | contains the "web" middleware group. Now create something great!
 |
 */
-Route::get('/', [WelcomeController::class, 'index']);
-Route::get('/portfolio', [HomeController::class, 'show']);
+Route::get('/', Welcome::class);
+Route::get('/portfolio/{just_get?}', Home::class);
+Route::get('/generate/{currentPhase?}', Generate::class);
+
 Route::get('/download/css', function () {
     return response()->download(public_path("css/app.css"));
 });
-// Route::get('/download', function () {
-//     $zip = new ZipArchive;
-//     $zip->open('portfolio.zip', ZipArchive::CREATE);
-//     foreach (['index.html', 'app.css'] as $file) {
-//       $zip->addFile($file);
-//     }
-//     $zip->close();
-//     return response()->download(public_path("css/app.css"));
-// });
 
-Route::get('/auth/redirect', function () {
-    if(request()->cookie("github_user")) {
-        return redirect('/portfolio')->with('github_user', unserialize(request()->cookie("github_user")));
-    }
-    return Socialite::driver('github')->redirect();
-});
+Route::get('/auth/clear/{get}', [Auth::class, 'clear']);
 
-Route::get('/auth/callback', function () {
-    $user = Socialite::driver('github')->user();
-    Cookie::queue(Cookie::make('github_user', serialize($user), 10));
-    return redirect('/portfolio')->with('github_user', $user);
-});
+Route::get('/auth/redirect', [Auth::class, 'authRedirect']);
+
+Route::get('/auth/callback', [Auth::class, 'callback']);
