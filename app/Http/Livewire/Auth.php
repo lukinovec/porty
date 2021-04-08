@@ -8,33 +8,24 @@ use Laravel\Socialite\Facades\Socialite;
 
 class Auth extends Component
 {
-    public function clear($get)
-    {
-        Cookie::queue(Cookie::forget("github_user"));
-        if($get == "true") {
-            return $this->redirect('generate/selection');
-        }
-        return redirect('/');
-    }
-
     public function authRedirect()
     {
         if(request()->cookie("github_user")) {
-            return redirect('generate/selection')->with('github_user', unserialize(request()->cookie("github_user")));
+            return redirect("generate/selection")->with("github_user", unserialize(request()->cookie("github_user")));
         }
-        return Socialite::driver('github')->redirect();
+        return Socialite::driver("github")->redirect();
     }
 
     public function callback()
     {
-        $user = Socialite::driver('github')->user();
-        Cookie::queue(Cookie::make('github_user', serialize($user), 10));
-        return redirect('generate/selection')->with('github_user', $user);
+        $user = Socialite::driver("github")->user();
+        Cookie::queue(Cookie::make("github_user", serialize($user), 10));
+        return redirect("generate/selection")->with("github_user", $user);
     }
 
     public function render()
     {
-        return view('livewire.auth')
-        ->extends('livewire.generate')->section('phase');
+        return view("livewire.auth")
+        ->extends("livewire.generate")->section("phase");
     }
 }

@@ -12,8 +12,8 @@
             View portfolio of {{ $user->nickname }}
         </button>
         @else
-        <button wire:click='generate()' class="btn">Generate a portfolio</button>
-        <a class="btn" href="generate/auth">Generate WIP</a>
+        <button class="btn" wire:click="generate()">Generate a portfolio</button>
+        <a class="btn" href="{{ url('auth') }}">Generate WIP</a>
         @endif
     </section>
 </div>

@@ -9,6 +9,7 @@ class Selection extends Component
 {
     public $projects;
     public $selected;
+    public $username;
 
     public function mount()
     {
@@ -16,6 +17,7 @@ class Selection extends Component
         $user = session("github_user") ?: unserialize(request()->cookie("github_user"));
         $github = new Github($user);
         $this->projects = $github->projects();
+        $this->username = $github->nickname;
     }
 
     // public function select($project)
@@ -31,9 +33,14 @@ class Selection extends Component
 
     public function finalize()
     {
-        $this->selected = collect($this->selected)->map(function($project_name) {
-            return collect($this->projects)->where("name", $project_name);
-        });
+        cache([
+            "{$this->username}_projects",
+            collect($this->selected)->map(function($project_name) {
+                return collect($this->projects)->where("name", $project_name);
+            })
+        ]);
+
+        return redirect("/generate/about");
     }
 
     public function render()

@@ -4,6 +4,7 @@ use App\Http\Livewire\Auth;
 use App\Http\Livewire\Home;
 use App\Http\Livewire\Welcome;
 use App\Http\Livewire\Generate;
+use App\Http\Middleware\UserExists;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -18,14 +19,15 @@ use Illuminate\Support\Facades\Route;
 */
 Route::get('/', Welcome::class);
 Route::get('/portfolio/{just_get?}', Home::class);
-Route::get('/generate/{currentPhase?}', Generate::class);
-
 Route::get('/download/css', function () {
     return response()->download(public_path("css/app.css"));
 });
 
-Route::get('/auth/clear/{get}', [Auth::class, 'clear']);
+Route::get('/auth', Generate::class);
+
+Route::middleware([UserExists::class])->group(function () {
+    Route::get('/generate/{currentPhase?}', Generate::class);
+});
 
 Route::get('/auth/redirect', [Auth::class, 'authRedirect']);
-
 Route::get('/auth/callback', [Auth::class, 'callback']);

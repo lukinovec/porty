@@ -15,7 +15,7 @@
 
         <div class="menu" x-show="menuVisible">
             <div class="flex flex-col p-1 text-center controls sm:flex-row">
-                <a class="m-1 font-semibold transition duration-500 ease-in-out delay-75 transform border-2 border-black sm:p-1 hover:scale-105 rounded-xl" href="{{ url('auth/clear/false') }}">Log out</a>
+                <button wire:click="clear()" class="m-1 font-semibold transition duration-500 ease-in-out delay-75 transform border-2 border-black sm:p-1 hover:scale-105 rounded-xl">Log out</button>
                 <button wire:click="refreshProjects()" class="m-1 font-semibold transition duration-500 ease-in-out delay-75 transform border-2 border-black sm:p-1 hover:scale-105 rounded-xl">Refresh projects</button>
             </div>
             <x-html />
