@@ -2,32 +2,54 @@
 
 namespace App\Http\Livewire;
 
-use Livewire\Component;
 use App\Http\Phase;
+use Livewire\Component;
+use Illuminate\Support\Collection;
 
 class Generate extends Component
 {
-    private $currentPhase;
-    private $phases;
+    public $phase;
+    protected $queryString = ['phase'];
 
-    public function mount($currentPhase = "auth")
+    public function getPhasesProperty(): Collection
     {
-        $this->phases = collect([
-            new Phase("auth", "Log in with GitHub", ["user" => null]),
-            new Phase("selection", "Select projects to show", ["projects" => null]),
-            new Phase("about", "Write something about yourself", ["input" => null]),
+        return collect([
+            new Phase("auth", "Log in with GitHub", true),
+            new Phase("selection", "Select projects to show", true),
+            new Phase("about", "Write something about yourself", true),
         ]);
+    }
 
-        $this->currentPhase = $this->phases->first(function($phase) use ($currentPhase) {
-            return $phase->type === $currentPhase;
+    public function hydrate()
+    {
+        if(! $this->phases->where("type", $this->phase)) {
+            abort(404);
+        }
+    }
+
+    public function getNextPhase(string $operation)
+    {
+        $found = $this->phases->search(function($phase) {
+            return $phase->type === $this->phase;
         });
+        return $operation == "+" ? $found + 1 : $found - 1;
+    }
 
-        abort_if($this->currentPhase === null, 404, "Phase not found");
+    public function move(string $operation)
+    {
+        $index = $this->getNextPhase($operation);
+        $next = $this->phases[$index];
+        $this->phase = $this->phases[$index]->type;
     }
 
     public function render()
     {
-        return view('livewire.generate', ["phases" => $this->phases, "currentPhase" => $this->currentPhase])
+        return view('livewire.generate', [
+            "phases" => $this->phases,
+            "currentPhase" => $this->phases->first(function($phase) {
+                return $phase->type === $this->phase;
+             })
+        ])
         ->extends('template')
         ->section('content');
     }

@@ -23,10 +23,8 @@ Route::get('/download/css', function () {
     return response()->download(public_path("css/app.css"));
 });
 
-Route::get('/auth', Generate::class);
-
 Route::middleware([UserExists::class])->group(function () {
-    Route::get('/generate/{currentPhase?}', Generate::class);
+    Route::get('/generate', Generate::class);
 });
 
 Route::get('/auth/redirect', [Auth::class, 'authRedirect']);

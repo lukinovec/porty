@@ -2,7 +2,9 @@
 
 namespace App\Http\Livewire;
 
+use ErrorException;
 use App\Http\Github;
+use App\Helpers\Memory;
 use Livewire\Component;
 
 class Selection extends Component
@@ -13,11 +15,15 @@ class Selection extends Component
 
     public function mount()
     {
-        $this->selected = [];
-        $user = session("github_user") ?: unserialize(request()->cookie("github_user"));
-        $github = new Github($user);
-        $this->projects = $github->projects();
-        $this->username = $github->nickname;
+        try {
+            $github = new Github(Memory::user());
+            $this->projects = $github->projects();
+            $this->username = $github->user->nickname;
+            $this->selected = [];
+        } catch (ErrorException $e) {
+            return redirect("/generate?phase=auth")->withException($e("Your login has expired, log in again please"));
+        }
+
     }
 
     // public function select($project)
@@ -33,14 +39,11 @@ class Selection extends Component
 
     public function finalize()
     {
-        cache([
-            "{$this->username}_projects",
-            collect($this->selected)->map(function($project_name) {
+        Memory::setProjects(collect($this->selected)->map(function($project_name) {
                 return collect($this->projects)->where("name", $project_name);
-            })
-        ]);
+            }));
 
-        return redirect("/generate/about");
+        return redirect("/generate?phase=about");
     }
 
     public function render()

@@ -10,4 +10,8 @@
     .flex-center {
         @apply flex items-center justify-center
     }
+
+    .nav-arrow {
+        @apply w-8 h-8 p-1 duration-300 transform bg-opacity-50 rounded-full cursor-pointer hover:scale-125 hover:bg-gray-50
+    }
 }

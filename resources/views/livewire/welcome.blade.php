@@ -13,7 +13,7 @@
         </button>
         @else
         <button class="btn" wire:click="generate()">Generate a portfolio</button>
-        <a class="btn" href="{{ url('auth') }}">Generate WIP</a>
+        <a class="btn" href="{{ url('/generate?phase=auth') }}">Generate WIP</a>
         @endif
     </section>
 </div>

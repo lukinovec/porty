@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire;
 
+use App\Helpers\Memory;
 use Livewire\Component;
 use Illuminate\Support\Facades\Cookie;
 use Laravel\Socialite\Facades\Socialite;
@@ -11,7 +12,7 @@ class Auth extends Component
     public function authRedirect()
     {
         if(request()->cookie("github_user")) {
-            return redirect("generate/selection")->with("github_user", unserialize(request()->cookie("github_user")));
+            return redirect("generate?phase=selection")->with("github_user", Memory::user());
         }
         return Socialite::driver("github")->redirect();
     }
@@ -19,8 +20,8 @@ class Auth extends Component
     public function callback()
     {
         $user = Socialite::driver("github")->user();
-        Cookie::queue(Cookie::make("github_user", serialize($user), 10));
-        return redirect("generate/selection")->with("github_user", $user);
+        Memory::setUser($user);
+        return redirect("generate?phase=selection")->with("github_user", $user);
     }
 
     public function render()

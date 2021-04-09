@@ -2,6 +2,8 @@
 
 namespace App\Http;
 
+use ErrorException;
+use App\Helpers\Memory;
 use Illuminate\Support\Facades\Http;
 
 class Github {
@@ -14,7 +16,7 @@ class Github {
         if($user) {
             $this->user = $user;
         } else {
-            abort(404, "User expired, <a href='/'>log in again please</a>");
+            throw new ErrorException("User expired, <a href='/'>log in again please</a>");
         }
     }
 
@@ -35,14 +37,13 @@ class Github {
             return $project;
         });
 
-        cache(["{$this->user->nickname}_projects" => $projects], 600);
-        return $projects;
+        return Memory::setProjects($projects, 600);
     }
 
     public function projects() {
         if($this->just_get) {
             return $this->getProjects();
         }
-        return cache("{$this->user->nickname}_projects") ?: $this->getProjects();
+        return Memory::projects() ?: $this->getProjects();
     }
 }
