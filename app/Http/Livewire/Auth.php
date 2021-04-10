@@ -4,14 +4,13 @@ namespace App\Http\Livewire;
 
 use App\Helpers\Memory;
 use Livewire\Component;
-use Illuminate\Support\Facades\Cookie;
 use Laravel\Socialite\Facades\Socialite;
 
 class Auth extends Component
 {
     public function authRedirect()
     {
-        if(request()->cookie("github_user")) {
+        if(Memory::user()) {
             return redirect("generate?phase=selection")->with("github_user", Memory::user());
         }
         return Socialite::driver("github")->redirect();
@@ -24,9 +23,14 @@ class Auth extends Component
         return redirect("generate?phase=selection")->with("github_user", $user);
     }
 
+    public function userForget()
+    {
+        return Memory::userForget();
+    }
+
     public function render()
     {
-        return view("livewire.auth")
+        return view("livewire.auth", ["memory" => \App\Helpers\Memory::class])
         ->extends("livewire.generate")->section("phase");
     }
 }

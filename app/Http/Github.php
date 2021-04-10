@@ -7,18 +7,10 @@ use App\Helpers\Memory;
 use Illuminate\Support\Facades\Http;
 
 class Github {
-    public $user;
-
     public function __construct(
-        $user,
+        public $user,
         public $just_get = false
-    ) {
-        if($user) {
-            $this->user = $user;
-        } else {
-            throw new ErrorException("User expired, <a href='/'>log in again please</a>");
-        }
-    }
+    ) {}
 
     private function get($endpoint) {
         return Http::withToken($this->user->token)->get($endpoint)->json();

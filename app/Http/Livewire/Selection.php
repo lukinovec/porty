@@ -2,7 +2,6 @@
 
 namespace App\Http\Livewire;
 
-use ErrorException;
 use App\Http\Github;
 use App\Helpers\Memory;
 use Livewire\Component;
@@ -15,35 +14,30 @@ class Selection extends Component
 
     public function mount()
     {
-        try {
-            $github = new Github(Memory::user());
-            $this->projects = $github->projects();
-            $this->username = $github->user->nickname;
-            $this->selected = [];
-        } catch (ErrorException $e) {
-            return redirect("/generate?phase=auth")->withException($e("Your login has expired, log in again please"));
-        }
-
+        $github = new Github(Memory::user());
+        $this->projects = $github->projects();
+        $this->username = $github->user->nickname;
+        $this->selected = array_map(fn($project) => $project["name"], Memory::selectedProjects());
     }
 
-    // public function select($project)
-    // {
-    //     if ($this->selected->contains($project)) {
-    //         $this->selected = $this->selected->reject(function($item) use ($project) {
-    //             return $item === $project;
-    //         });
-    //     } else {
-    //         $this->selected[] = $project;
-    //     }
-    // }
+    public function select()
+    {
+        $selection = [];
+
+        foreach ($this->selected as $selected_project_name) {
+            foreach($this->projects as $project) {
+                if($project["name"] === $selected_project_name) array_push($selection, $project);
+            }
+        }
+
+        return $selection;
+    }
 
     public function finalize()
     {
-        Memory::setProjects(collect($this->selected)->map(function($project_name) {
-                return collect($this->projects)->where("name", $project_name);
-            }));
+        Memory::setSelectedProjects($this->select());
 
-        return redirect("/generate?phase=about");
+        $this->emit("move", "+");
     }
 
     public function render()

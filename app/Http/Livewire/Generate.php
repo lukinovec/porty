@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire;
 
+use App\Helpers\Memory;
 use App\Http\Phase;
 use Livewire\Component;
 use Illuminate\Support\Collection;
@@ -9,27 +10,43 @@ use Illuminate\Support\Collection;
 class Generate extends Component
 {
     public $phase;
-    protected $queryString = ['phase'];
+    protected $queryString = ["phase"];
+    protected $listeners = ["move"];
 
-    public function getPhasesProperty(): Collection
+    public function getPhases(): Collection
     {
+
         return collect([
-            new Phase("auth", "Log in with GitHub", true),
-            new Phase("selection", "Select projects to show", true),
-            new Phase("about", "Write something about yourself", true),
+            new Phase(Auth::class, "Log in with GitHub", fn() => (bool) Memory::user(), true),
+            new Phase(Selection::class, "Select projects to show", fn() => (bool) Memory::selectedProjects(), true),
+            new Phase(Contact::class, "Give others a way to contact you", fn() => (bool) Memory::userBio()),
+            new Phase(About::class, "Write something about yourself", fn() => (bool) Memory::userBio()),
         ]);
+    }
+
+    public function getCurrentPhase()
+    {
+        return $this->findPhase($this->phase);
     }
 
     public function hydrate()
     {
-        if(! $this->phases->where("type", $this->phase)) {
+        if(! $this->getPhases()->where("type", $this->phase)) {
             abort(404);
         }
     }
 
-    public function getNextPhase(string $operation)
+    public function findPhase(string $type): Phase
     {
-        $found = $this->phases->search(function($phase) {
+        return $this->getPhases()->first(function($phase) use ($type) {
+            return $phase->type === $type;
+        });
+    }
+
+
+    public function getNextPhaseIndex(string $operation): int
+    {
+        $found = $this->getPhases()->search(function($phase) {
             return $phase->type === $this->phase;
         });
         return $operation == "+" ? $found + 1 : $found - 1;
@@ -37,19 +54,17 @@ class Generate extends Component
 
     public function move(string $operation)
     {
-        $index = $this->getNextPhase($operation);
-        $next = $this->phases[$index];
-        $this->phase = $this->phases[$index]->type;
+        if(($this->getCurrentPhase()->required && $this->getCurrentPhase()->isComplete())
+        || !$this->getCurrentPhase()->required || $operation == "-") {
+            $this->phase = $this->getPhases()[$this->getNextPhaseIndex($operation)]->type;
+        } else {
+            session()->flash("message", $this->getCurrentPhase()->text);
+        }
     }
 
     public function render()
     {
-        return view('livewire.generate', [
-            "phases" => $this->phases,
-            "currentPhase" => $this->phases->first(function($phase) {
-                return $phase->type === $this->phase;
-             })
-        ])
+        return view('livewire.generate')
         ->extends('template')
         ->section('content');
     }

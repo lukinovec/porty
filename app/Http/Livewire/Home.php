@@ -26,8 +26,7 @@ class Home extends Component
 
     public function clear()
     {
-        Cookie::queue(Cookie::forget("github_user"));
-        return redirect("/");
+        return \App\Helpers\Memory::userForget();
     }
 
     public function refreshProjects()
