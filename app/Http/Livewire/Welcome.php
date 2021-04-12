@@ -15,6 +15,11 @@ class Welcome extends Component
         return redirect("auth/redirect");
     }
 
+    public function forget()
+    {
+        return app('logout');
+    }
+
     public function render()
     {
         return view('livewire.welcome', [

@@ -10,7 +10,7 @@ class Home extends Component
 
     public function mount()
     {
-        $this->projects = dd($this->getUser()->projects());
+        $this->projects = $this->getUser()->projects();
     }
 
     public function getUser()
@@ -31,7 +31,7 @@ class Home extends Component
     public function render()
     {
         return view('livewire.home', [
-            "user" => $this->getUser()->user,
+            "user" => $this->getUser()->user_details,
             "projects" => $this->projects,
         ])
         ->extends('template')

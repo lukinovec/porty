@@ -8,16 +8,17 @@ use Livewire\Component;
 
 class Selection extends Component
 {
-    public $selected;
+    public $selected = [];
 
     public function mount()
     {
-        $github = app(Github::class);
-        if((new Memory)->get($github->user->nickname . '_selected_projects')) {
-            $this->selected = array_map(fn($project) => $project["name"], (new Memory)->get($github->user->nickname . '_selected_projects'));
-        } else {
-            $this->selected = [];
+        $selected_projects = app(Github::class)->selected_projects;
+        if($selected_projects) {
+            $this->selected = array_map(fn($project) => $project['name'], $selected_projects);
         }
+        // else {
+        //     $this->selected = [];
+        // }
     }
 
     public function select()
@@ -25,8 +26,8 @@ class Selection extends Component
         $selection = [];
 
         foreach ($this->selected as $selected_project_name) {
-            foreach(app(Github::class)->projects()->toArray() as $project) {
-                if($project["name"] === $selected_project_name) array_push($selection, $project);
+            foreach(app(Github::class)->projects as $project) {
+                if($project['name'] === $selected_project_name) array_push($selection, $project);
             }
         }
 
@@ -35,16 +36,15 @@ class Selection extends Component
 
     public function finalize()
     {
-        (new Memory)->set([app(Github::class)->user->nickname . '_selected_projects' => $this->select()]);
-
-        $this->emit("move", "+");
+        app(Github::class)->save('selected_projects', $this->select());
+        $this->emit('move', '+');
     }
 
     public function render()
     {
         return view('livewire.selection', [
-            "github" => app(Github::class),
-            "selected" => $this->selected
+            'github' => app(Github::class),
+            'selected' => $this->selected
         ])
         ->extends('livewire.generate')->section('phase');
     }

@@ -16,14 +16,23 @@ class Generate extends Component
     public function getPhases(): Collection
     {
         $github = app(\App\Helpers\Github::class);
-        $user_nickname = isset($github->user->nickname) ? $github->user->nickname : false;
-
-        return collect([
-            new Phase(Auth::class, "Log in with GitHub", fn() => (bool) $github, true),
-            new Phase(Selection::class, "Select projects to show", fn() => (bool) app(Memory::class)->get($user_nickname . '_selected_projects'), true),
-            new Phase(Contact::class, "Give others a way to contact you", fn() => (bool) app(Memory::class)->get($user_nickname . '_bio')),
-            new Phase(About::class, "Write something about yourself", fn() => (bool) app(Memory::class)->get($user_nickname . '_bio')),
-        ]);
+        // $user_nickname = isset($github->user->nickname) ? $github->user->nickname : false;
+        // $memory = app(Memory::class);
+        if($github instanceof(Github::class)) {
+            return collect([
+                new Phase(Auth::class, "Log in with GitHub", fn() => (bool) $github, true),
+                new Phase(Selection::class, "Select projects to show", fn() => (bool) $github->selected_projects, true),
+                new Phase(Contact::class, "Give others a way to contact you", fn() => (bool) $github->about['contact']),
+                new Phase(About::class, "Write something about yourself", fn() => (bool) $github->about['bio']),
+            ]);
+        } else {
+            return collect([
+                new Phase(Auth::class, "Log in with GitHub", fn() => (bool) $github, true),
+                new Phase(Selection::class, "Select projects to show", fn() => false, true),
+                new Phase(Contact::class, "Give others a way to contact you", fn() => false),
+                new Phase(About::class, "Write something about yourself", fn() => false),
+            ]);
+        }
     }
 
     public function getCurrentPhase()

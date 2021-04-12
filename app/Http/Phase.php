@@ -9,7 +9,7 @@ class Phase {
     public function __construct(
         string $livewire_classname,
         public string $text,
-        public Closure $completionCheck,
+        private Closure $completionCheck,
         public bool $required = false
     ) {
         $type = explode("\\", strtolower($livewire_classname));

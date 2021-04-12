@@ -1,7 +1,7 @@
 <div class="flex flex-col items-center justify-center">
     @if ($github)
     <section class="flex flex-col">
-        You are logged in as {{ $github->user->nickname }}
+        You are logged in as {{ $github->nickname }}
         <div class="flex">
             <button wire:click="userForget()" class="mx-2 btn">Log out</button>
             <button wire:click="$emit('move', '+')" class="mx-2 btn">Continue</button>

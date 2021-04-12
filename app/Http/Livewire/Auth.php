@@ -11,27 +11,24 @@ class Auth extends Component
 {
     public function authRedirect()
     {
-        if(app(Github::class)) {
-            return redirect("generate?phase=selection")->with("github_user", app(Github::class));
-        }
-        return Socialite::driver("github")->redirect();
+        return Socialite::driver('github')->redirect();
     }
 
     public function callback()
     {
-        $user = Socialite::driver("github")->user();
-        Cookie::queue(Cookie::make("github_user", serialize($user), 8));
-        return redirect("generate?phase=selection")->with("github_user", $user);
+        $socialite_user = Socialite::driver('github')->user();
+        Cookie::queue(Cookie::make('socialite_user', serialize($socialite_user), 8));
+        return redirect('generate?phase=selection');
     }
 
     public function userForget()
     {
-        return app(Github::class)->forget();
+        return app('logout');
     }
 
     public function render()
     {
-        return view("livewire.auth", ["github" => app(Github::class)])
-        ->extends("livewire.generate")->section("phase");
+        return view('livewire.auth', ['github' => app(Github::class)])
+        ->extends('livewire.generate')->section('phase');
     }
 }
