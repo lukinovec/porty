@@ -9,12 +9,10 @@ use Livewire\Component;
 class Selection extends Component
 {
     public $selected;
-    public $projects;
 
     public function mount()
     {
         $github = app(Github::class);
-        $this->projects = $github->projects();
         if((new Memory)->get($github->user->nickname . '_selected_projects')) {
             $this->selected = array_map(fn($project) => $project["name"], (new Memory)->get($github->user->nickname . '_selected_projects'));
         } else {
@@ -27,7 +25,7 @@ class Selection extends Component
         $selection = [];
 
         foreach ($this->selected as $selected_project_name) {
-            foreach($this->projects as $project) {
+            foreach(app(Github::class)->projects()->toArray() as $project) {
                 if($project["name"] === $selected_project_name) array_push($selection, $project);
             }
         }
@@ -45,8 +43,7 @@ class Selection extends Component
     public function render()
     {
         return view('livewire.selection', [
-            "username" => app(Github::class)->user->nickname,
-            "projects" => app(Github::class)->projects(),
+            "github" => app(Github::class),
             "selected" => $this->selected
         ])
         ->extends('livewire.generate')->section('phase');

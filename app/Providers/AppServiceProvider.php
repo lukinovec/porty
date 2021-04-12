@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Helpers\Github;
+use App\Helpers\Memory;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -17,10 +18,13 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(Github::class, function($app) {
             $user = session('github_user') ?: unserialize(request()->cookie('github_user'));
             if(!$user) {
-                // abort(404, 'Your portfolio might have expired<br>  <a href='/auth/redirect'>click here to log in again</a>');
                 return false;
             }
             return (new Github($user));
+        });
+
+        $this->app->bind(Memory::class, function($app) {
+            return new Memory;
         });
     }
 
