@@ -2,22 +2,24 @@
 
 namespace App\Http\Livewire;
 
-use App\Http\Github;
+use App\Helpers\Github;
 use App\Helpers\Memory;
 use Livewire\Component;
 
 class Selection extends Component
 {
-    public $projects;
     public $selected;
-    public $username;
+    public $projects;
 
     public function mount()
     {
-        $github = new Github(Memory::user());
+        $github = app(Github::class);
         $this->projects = $github->projects();
-        $this->username = $github->user->nickname;
-        $this->selected = array_map(fn($project) => $project["name"], Memory::selectedProjects());
+        if((new Memory)->get($github->user->nickname . '_selected_projects')) {
+            $this->selected = array_map(fn($project) => $project["name"], (new Memory)->get($github->user->nickname . '_selected_projects'));
+        } else {
+            $this->selected = [];
+        }
     }
 
     public function select()
@@ -35,7 +37,7 @@ class Selection extends Component
 
     public function finalize()
     {
-        Memory::setSelectedProjects($this->select());
+        (new Memory)->set([app(Github::class)->user->nickname . '_selected_projects' => $this->select()]);
 
         $this->emit("move", "+");
     }
@@ -43,7 +45,8 @@ class Selection extends Component
     public function render()
     {
         return view('livewire.selection', [
-            "projects" => $this->projects,
+            "username" => app(Github::class)->user->nickname,
+            "projects" => app(Github::class)->projects(),
             "selected" => $this->selected
         ])
         ->extends('livewire.generate')->section('phase');

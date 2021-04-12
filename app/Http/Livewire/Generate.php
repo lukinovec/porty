@@ -15,12 +15,15 @@ class Generate extends Component
 
     public function getPhases(): Collection
     {
-
+        // TBD
+        $memory = new Memory;
+        $user = app(\App\Helpers\Github::class);
+        $user_nickname = isset($user->nickname) ? $user->nickname : false;
         return collect([
-            new Phase(Auth::class, "Log in with GitHub", fn() => (bool) Memory::user(), true),
-            new Phase(Selection::class, "Select projects to show", fn() => (bool) Memory::selectedProjects(), true),
-            new Phase(Contact::class, "Give others a way to contact you", fn() => (bool) Memory::userBio()),
-            new Phase(About::class, "Write something about yourself", fn() => (bool) Memory::userBio()),
+            new Phase(Auth::class, "Log in with GitHub", fn() => (bool) $user, true),
+            new Phase(Selection::class, "Select projects to show", fn() => (bool) $memory->get($user_nickname . '_selected_projects'), true),
+            new Phase(Contact::class, "Give others a way to contact you", fn() => (bool) $memory->get($user_nickname . '_bio')),
+            new Phase(About::class, "Write something about yourself", fn() => (bool) $memory->get($user_nickname . '_bio')),
         ]);
     }
 

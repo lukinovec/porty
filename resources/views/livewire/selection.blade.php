@@ -1,6 +1,5 @@
 <div class="flex flex-col">
     <div style="max-height: 40rem" class="flex flex-col items-start p-4 overflow-auto border-4 sm:max-h-3/4 rounded-xl border-gray">
-        {{-- {{ dd($selected) }} --}}
         @foreach ($projects as $project)
         <div class="p-2">
             <span class="font-bold">

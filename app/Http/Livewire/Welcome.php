@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire;
 
+use App\Helpers\Github;
 use Livewire\Component;
 
 class Welcome extends Component
@@ -17,7 +18,7 @@ class Welcome extends Component
     public function render()
     {
         return view('livewire.welcome', [
-            "user" => unserialize(request()->cookie("github_user"))
+            "user" => app(Github::class)
         ])->extends('template')
         ->section('content');
     }

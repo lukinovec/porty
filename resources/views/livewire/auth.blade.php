@@ -1,10 +1,10 @@
 <div class="flex flex-col items-center justify-center">
-    @if ($memory::user())
+    @if ($github)
     <section class="flex flex-col">
-        You are logged in as {{ $memory::user()->nickname }}
+        You are logged in as {{ $github->user->nickname }}
         <div class="flex">
             <button wire:click="userForget()" class="mx-2 btn">Log out</button>
-            <button wire:click="$emit('move', '+')" class="mx-2 underline btn">Continue</button>
+            <button wire:click="$emit('move', '+')" class="mx-2 btn">Continue</button>
         </div>
     </section>
     @else

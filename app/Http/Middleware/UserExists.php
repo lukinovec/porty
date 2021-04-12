@@ -3,7 +3,7 @@
 namespace App\Http\Middleware;
 
 use Closure;
-use App\Helpers\Memory;
+use App\Helpers\Github;
 use Illuminate\Http\Request;
 
 class UserExists
@@ -17,7 +17,7 @@ class UserExists
      */
     public function handle(Request $request, Closure $next)
     {
-        if (Memory::user() || $request->input("phase") === "auth") {
+        if (app(Github::class) || $request->input("phase") === "auth") {
             return $next($request);
         }
         return redirect("/");

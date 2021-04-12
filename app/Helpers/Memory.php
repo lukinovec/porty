@@ -1,65 +1,31 @@
 <?php
 namespace App\Helpers;
-use Illuminate\Support\Facades\Cookie;
+use Closure;
+
 class Memory {
-    /**
-     * TBD - make a separate class for projects with user check in construct
-     * Get github user from cache
-     */
-    public static function projects() {
-        return userCheck(fn() => cache(self::user()->nickname . "_projects") ?: []);
-    }
 
-    /**
-     * TBD - make a separate class for projects with user check in construct
-     * Set github user to cache
-     */
-    public static function setProjects(\Illuminate\Support\Collection $projects, int $ttl = 440): bool {
-        return userCheck(fn() => cache([self::user()->nickname . "_projects" => $projects], $ttl));
-    }
+    public function __construct() {}
 
-    public static function selectedProjects(): array|bool {
-        return userCheck(fn() => cache(self::user()->nickname . "_selected_projects") ?: []);
-    }
-
-    public static function setSelectedProjects(array $selected) {
-        return userCheck(function() use ($selected) {
-            $cache_key = self::user()->nickname . "_selected_projects";
-            return cache([$cache_key => $selected]);
-        });
-    }
-
-
-    /**
-     * Get user's github projects from cookies
-     */
-    public static function user() {
-        $user = request()->cookie("github_user");
-        if($user) {
-            return unserialize($user);
+    private function userCheck(Closure $closure) {
+        if(app(Github::class)) {
+            return $closure();
         }
-        return session("github_user") ?: false;
+        return false;
     }
 
-    public static function userBio()
+    /**
+     * @param array $to_set [key => value]
+     */
+    public function set(array $to_set, int $ttl = 440)
     {
-        return userCheck(fn() => cache(self::user()->nickname . "_bio"));
+        return $this->userCheck(fn() => cache($to_set, $ttl));
     }
 
-    public static function setUser(\Laravel\Socialite\Contracts\User $user) {
-        Cookie::queue(Cookie::make("github_user", serialize($user), 8));
-    }
-
-    public static function setUserBio($bio)
+    /**
+     * @param array $to_get [key => value]
+     */
+    public function get(string $to_get)
     {
-        return userCheck(fn() => cache([self::user()->nickname . "_bio", $bio]));
+        return $this->userCheck(fn() => cache($to_get));
     }
-
-    public static function userForget()
-    {
-        Cookie::queue(Cookie::forget("github_user"));
-        return redirect("/generate?phase=auth");
-    }
-
-
 }

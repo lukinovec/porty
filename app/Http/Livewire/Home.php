@@ -2,36 +2,30 @@
 
 namespace App\Http\Livewire;
 
-use App\Http\Github;
+use App\Helpers\Github;
 use Livewire\Component;
-use Illuminate\Support\Facades\Cookie;
-
 class Home extends Component
 {
     public $projects;
 
     public function mount()
     {
-        $this->projects = $this->getUser()->projects();
+        $this->projects = dd($this->getUser()->projects());
     }
 
-    public function getUser($just_get = false)
+    public function getUser()
     {
-        $user = session("github_user") ?: unserialize(request()->cookie("github_user"));
-        if(!$user) {
-            abort(404, "Your portfolio might have expired<br>  <a href='/auth/redirect'>click here to log in again</a>");
-        }
-        return new Github($user, $just_get);
+        return app(Github::class) ?: abort(404, "Your portfolio might have expired<br>  <a href='/auth/redirect'>click here to log in again</a>");
     }
 
     public function clear()
     {
-        return \App\Helpers\Memory::userForget();
+        return $this->getUser()->forget();
     }
 
     public function refreshProjects()
     {
-        $this->projects = $this->getUser(true)->getProjects();
+        $this->projects = $this->getUser()->projects(true);
     }
 
     public function render()
