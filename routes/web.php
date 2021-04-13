@@ -18,12 +18,12 @@ use Illuminate\Support\Facades\Route;
 |
 */
 Route::get('/', Welcome::class);
-Route::get('/portfolio/{just_get?}', Home::class);
 Route::get('/download/css', function () {
     return response()->download(public_path("css/app.css"));
 });
 
 Route::middleware([UserExists::class])->group(function () {
+    Route::get('/portfolio', Home::class);
     Route::get('/generate', Generate::class);
 });
 

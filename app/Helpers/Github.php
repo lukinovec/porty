@@ -1,29 +1,51 @@
 <?php
 
 namespace App\Helpers;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Cookie;
-
 class Github {
-    public array $selected_projects = [];
+    public $authenticated = true;
+    public $user_details = null;
+    public $nickname = '';
+    private $selected_projects = [];
+    private $memory = null;
 
-    public function __construct(\Laravel\Socialite\Two\User $user) {
-        $this->user_details = $user;
-        $this->nickname = $user->nickname;
-        $this->token = $user->token;
-        $this->projects = (new GithubFetch([
-            'token' => $this->token,
-            'nickname' => $this->nickname,
-            'repos_url' => $user['repos_url']
-        ]))->projects();
+    public function __construct(\Laravel\Socialite\Two\User|bool $user) {
+        if($user) {
+            $this->user_details = $user;
+            $this->nickname = $user->nickname;
+            $this->memory = new Memory($this);
+        } else {
+            $this->authenticated = false;
+        }
     }
 
-    public function save(string $propertyName = '', $value = '')
+    public function __get(string $propertyName = '')
     {
-        if($propertyName && $value) {
-            $this->$propertyName = $value;
+        if($this->authenticated) {
+            switch ($propertyName) {
+                case 'projects':
+                    return (new GithubFetch([
+                        'token' => $this->user_details->token,
+                        'nickname' => $this->nickname,
+                        'repos_url' => $this->user_details['repos_url']
+                        ]))->projects();
+
+                default:
+                    return $this->memory->get($this->nickname . '_' . $propertyName);
+            }
         }
-        Cookie::queue(Cookie::make('socialite_user', serialize($this->user_details), 8));
-        return $this;
+        return false;
+    }
+
+    public function __set(string $propertyName = '', $value = false)
+    {
+        return $this->save($propertyName, $value);
+    }
+
+    public function save(string $propertyName = '', $value = false)
+    {
+        if(! $value && $this->$propertyName) {
+            $value = $this->$propertyName;
+        }
+        return $this->memory->set([$this->nickname . '_' . $propertyName => $value]);
     }
 }

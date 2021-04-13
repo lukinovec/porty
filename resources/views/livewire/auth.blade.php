@@ -1,5 +1,5 @@
 <div class="flex flex-col items-center justify-center">
-    @if ($github)
+    @if ($github->authenticated)
     <section class="flex flex-col">
         You are logged in as {{ $github->nickname }}
         <div class="flex">
@@ -16,4 +16,5 @@
         After you log in, you will be redirected back and Porty will get all your projects.
     </p>
     @endif
+    <x-loading />
 </div>

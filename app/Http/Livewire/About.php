@@ -6,11 +6,7 @@ use Livewire\Component;
 
 class About extends Component
 {
-    public function sendBio(string $bio)
-    {
-        dd($bio);
-        $this->emit("move", "+");
-    }
+    use SetsText;
 
     public function render()
     {

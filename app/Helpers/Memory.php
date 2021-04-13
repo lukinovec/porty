@@ -4,28 +4,22 @@ use Closure;
 
 class Memory {
 
-    public function __construct() {}
+    public function __construct(private Github $github) {}
 
     private function userCheck(Closure $closure) {
-        if(app(Github::class)) {
+        if($this->github) {
             return $closure();
         }
         return false;
     }
 
-    /**
-     * @param array $to_set [key => value]
-     */
-    public function set(array $to_set, int $ttl = 440)
+    public function set(array $to_set, int $ttl = 1200)
     {
-        return $this->userCheck(fn() => cache($to_set, $ttl));
+        return $this->userCheck(fn() => cache($to_set, $ttl) ?: false);
     }
 
-    /**
-     * @param array $to_get [key => value]
-     */
     public function get(string $to_get)
     {
-        return $this->userCheck(fn() => cache($to_get));
+        return $this->userCheck(fn() => cache($to_get) ?: false);
     }
 }

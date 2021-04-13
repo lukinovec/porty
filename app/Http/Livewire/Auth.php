@@ -9,6 +9,12 @@ use Laravel\Socialite\Facades\Socialite;
 
 class Auth extends Component
 {
+    private $github;
+    public function mount(Github $github)
+    {
+        $this->github = $github;
+    }
+
     public function authRedirect()
     {
         return Socialite::driver('github')->redirect();
@@ -17,7 +23,7 @@ class Auth extends Component
     public function callback()
     {
         $socialite_user = Socialite::driver('github')->user();
-        Cookie::queue(Cookie::make('socialite_user', serialize($socialite_user), 8));
+        Cookie::queue(Cookie::make('socialite_user', serialize($socialite_user), 20));
         return redirect('generate?phase=selection');
     }
 
@@ -28,7 +34,7 @@ class Auth extends Component
 
     public function render()
     {
-        return view('livewire.auth', ['github' => app(Github::class)])
+        return view('livewire.auth', ['github' => $this->github])
         ->extends('livewire.generate')->section('phase');
     }
 }

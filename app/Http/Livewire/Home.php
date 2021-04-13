@@ -7,10 +7,12 @@ use Livewire\Component;
 class Home extends Component
 {
     public $projects;
+    private $user;
 
     public function mount()
     {
-        $this->projects = $this->getUser()->projects();
+        $this->user = $this->getUser();
+        $this->projects = $this->user->selected_projects;
     }
 
     public function getUser()
@@ -20,12 +22,7 @@ class Home extends Component
 
     public function clear()
     {
-        return $this->getUser()->forget();
-    }
-
-    public function refreshProjects()
-    {
-        $this->projects = $this->getUser()->projects(true);
+        return app('logout');
     }
 
     public function render()

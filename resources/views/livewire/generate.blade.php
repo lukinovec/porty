@@ -57,8 +57,6 @@
         {{ request('message') ?: '' }}
         @livewire($this->getCurrentPhase()->type, key($this->getCurrentPhase()->type))
     </section>
-    <section wire:loading.flex class='flex-col flex-1 w-full px-6 space-y-5 text-2xl h-3/4 flex-center'>
-        <img class="w-36 h-36 animate-spin" src='{{ asset('images/loading.svg') }}' alt=''>
-        <p>Loading, please wait...</p>
-    </section>
+
+    <x-loading />
 </div>

@@ -2,7 +2,7 @@
 
 namespace App\Http\Livewire;
 
-use App\Helpers\Memory;
+use App\Helpers\Github;
 use App\Http\Phase;
 use Livewire\Component;
 use Illuminate\Support\Collection;
@@ -10,29 +10,19 @@ use Illuminate\Support\Collection;
 class Generate extends Component
 {
     public $phase;
-    protected $queryString = ["phase"];
-    protected $listeners = ["move"];
+    protected $queryString = ['phase'];
+    protected $listeners = ['move'];
 
     public function getPhases(): Collection
     {
-        $github = app(\App\Helpers\Github::class);
-        // $user_nickname = isset($github->user->nickname) ? $github->user->nickname : false;
-        // $memory = app(Memory::class);
-        if($github instanceof(Github::class)) {
-            return collect([
-                new Phase(Auth::class, "Log in with GitHub", fn() => (bool) $github, true),
-                new Phase(Selection::class, "Select projects to show", fn() => (bool) $github->selected_projects, true),
-                new Phase(Contact::class, "Give others a way to contact you", fn() => (bool) $github->about['contact']),
-                new Phase(About::class, "Write something about yourself", fn() => (bool) $github->about['bio']),
-            ]);
-        } else {
-            return collect([
-                new Phase(Auth::class, "Log in with GitHub", fn() => (bool) $github, true),
-                new Phase(Selection::class, "Select projects to show", fn() => false, true),
-                new Phase(Contact::class, "Give others a way to contact you", fn() => false),
-                new Phase(About::class, "Write something about yourself", fn() => false),
-            ]);
-        }
+        $github = app(Github::class);
+        error_log('Getting phases...');
+        return collect([
+            new Phase(Auth::class, 'Log in with GitHub', fn() => (bool) $github->authenticated, true),
+            new Phase(Selection::class, 'Select projects to show', fn() => (bool) $github->selected_projects, true),
+            new Phase(Contact::class, 'Give others a way to contact you', fn() => strlen($github->contact) > 0),
+            new Phase(About::class, 'Write something about yourself', fn() => strlen($github->bio) > 0),
+        ]);
     }
 
     public function getCurrentPhase()
@@ -42,7 +32,7 @@ class Generate extends Component
 
     public function hydrate()
     {
-        if(! $this->getPhases()->where("type", $this->phase)) {
+        if(! $this->getPhases()->where('type', $this->phase)) {
             abort(404);
         }
     }
@@ -60,17 +50,37 @@ class Generate extends Component
         $found = $this->getPhases()->search(function($phase) {
             return $phase->type === $this->phase;
         });
-        return $operation == "+" ? $found + 1 : $found - 1;
+        return $operation == '+' ? $found + 1 : $found - 1;
     }
 
     public function move(string $operation)
     {
-        if(($this->getCurrentPhase()->required && $this->getCurrentPhase()->isComplete())
-        || !$this->getCurrentPhase()->required || $operation == "-") {
+        $phase_is = [
+            'required' => $this->getCurrentPhase()->required,
+            'complete' => $this->getCurrentPhase()->isComplete(),
+            'last' => $this->getNextPhaseIndex('+') === $this->getPhases()->count()
+        ];
+
+        if((($phase_is['required'] && $phase_is['complete']) ||
+        ! $phase_is['required'] ||
+        $operation == '-') && !$phase_is['last']) {
+
             $this->phase = $this->getPhases()[$this->getNextPhaseIndex($operation)]->type;
+
+        } elseif($phase_is['last']) {
+
+            $this->generatePortfolio();
+
         } else {
-            session()->flash("message", $this->getCurrentPhase()->text);
+
+            session()->flash('message', $this->getCurrentPhase()->text);
+
         }
+    }
+
+    public function generatePortfolio()
+    {
+        return redirect('/portfolio');
     }
 
     public function render()

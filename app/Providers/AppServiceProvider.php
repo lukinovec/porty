@@ -17,12 +17,8 @@ class AppServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->singleton(Github::class, function($app) {
-            $user = request()->cookie('socialite_user');
-            return $user ? new Github(unserialize($user)) : false;
-        });
-
-        $this->app->bind(Memory::class, function($app) {
-            return new Memory;
+            $user = request()->cookie('socialite_user') ? unserialize(request()->cookie('socialite_user')) : false;
+            return new Github($user);
         });
 
         $this->app->bind('logout', function($app) {

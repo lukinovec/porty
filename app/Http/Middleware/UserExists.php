@@ -17,7 +17,7 @@ class UserExists
      */
     public function handle(Request $request, Closure $next)
     {
-        if (app(Github::class) || $request->input("phase") === "auth") {
+        if (app(Github::class)->authenticated || $request->input("phase") === "auth") {
             return $next($request);
         }
         return redirect("/");
