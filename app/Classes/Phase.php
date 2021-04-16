@@ -1,9 +1,11 @@
 <?php
-namespace App\Http;
+
+namespace App\Classes;
 
 use Closure;
 
-class Phase {
+class Phase
+{
     public string $type;
 
     public function __construct(
@@ -12,7 +14,7 @@ class Phase {
         private Closure $completionCheck,
         public bool $required = false
     ) {
-        $type = explode("\\", strtolower($livewire_classname));
+        $type = explode('\\', strtolower($livewire_classname));
         $this->type = end($type);
     }
 

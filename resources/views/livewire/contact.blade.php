@@ -6,4 +6,14 @@
         <button x-on:click="$wire.emit('move', '+')" class="btn">Skip</button>
         <button wire:click="save" class="btn">Send and Continue</button>
     </div>
+
+    <div class='flex-col flex-center'>
+        <h1>Your projects</h1>
+        <section>
+            @foreach ($github->selected_projects as $project)
+                {{ $project['name'] }}
+                {{ $project['description'] }}
+            @endforeach
+        </section>
+    </div>
 </div>

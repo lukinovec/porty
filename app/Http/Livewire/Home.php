@@ -4,6 +4,7 @@ namespace App\Http\Livewire;
 
 use App\Helpers\Github;
 use Livewire\Component;
+
 class Home extends Component
 {
     public $projects;
@@ -27,10 +28,17 @@ class Home extends Component
 
     public function render()
     {
-        return view('livewire.home', [
-            "user" => $this->getUser()->user_details,
-            "projects" => $this->projects,
-        ])
+        $user = $this->getUser();
+
+        return view(
+            'livewire.home',
+            [
+                'user' => $user->user_details,
+                'bio' => $user->about,
+                'contact' => $user->contact,
+                'projects' => $this->projects,
+            ]
+        )
         ->extends('template')
         ->section('content');
     }
