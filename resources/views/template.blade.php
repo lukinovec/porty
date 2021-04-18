@@ -34,5 +34,22 @@
           var embla = EmblaCarousel(emblaNode, options)
         </script> --}}
         @livewireScripts
+        <script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+        <script src="//cdn.jsdelivr.net/npm/promise-polyfill@8/dist/polyfill.js"></script>
+        <script>
+            async function uploadImage({ name, owner }) {
+                const { value: url } = await Swal.fire({
+                  input: 'url',
+                  inputLabel: 'Image link',
+                  inputPlaceholder: 'Enter the URL'
+                })
+                if (url) {
+                    Livewire.emit('upload-image', {url: url, owner: owner, name: name})
+                }
+            }
+            window.addEventListener('swal:upload-image', event => {
+                uploadImage(event.detail);
+            })
+        </script>
     </body>
 </html>

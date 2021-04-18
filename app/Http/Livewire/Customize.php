@@ -30,7 +30,8 @@ class Customize extends Component
     {
         $github->selected_projects = $this->updates;
         $github->selection_customized = true;
-        $this->emit('move', '+');
+
+        return redirect('/portfolio');
     }
 
     public function render()

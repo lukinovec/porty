@@ -13,8 +13,6 @@
             </div>
         </div>
 
-
-
         <div class='menu' x-show='menuVisible'>
             <div class='flex flex-col p-1 text-center controls sm:flex-row'>
                 <button wire:click='clear()' class='m-1 font-semibold transition duration-500 ease-in-out delay-75 transform border-2 border-black sm:p-1 hover:scale-105 rounded-xl'>Log out</button>
@@ -29,14 +27,19 @@
                 <h1 class='text-2xl font-extrabold'>{{ $user->nickname }}</h1>
             </a>
 
+            @if ($contact)
             <span class='flex-1'>
                 <h1 class='text-xl font-bold'>Contact</h1>
                 <p>{{ $contact }}</p>
             </span>
+            @endif
+
+            @if ($bio)
             <span class='flex-1'>
                 <h1 class='text-xl font-bold'>Bio</h1>
                 <p>{{ $bio }}</p>
             </span>
+            @endif
         </div>
         <div class='h-full pt-8' id='projects'>
             @forelse ($projects as $project)

@@ -11,11 +11,6 @@ class Generate extends Component
     protected $listeners = ['move'];
     use HasPhases;
 
-    public function getCurrentPhase()
-    {
-        return $this->findPhase($this->phase);
-    }
-
     public function hydrate()
     {
         if (!$this->getPhases()->where('type', $this->phase)) {
@@ -23,44 +18,22 @@ class Generate extends Component
         }
     }
 
-    public function findPhase(string $type): \App\Classes\Phase
-    {
-        return $this->getPhases()->first(function ($phase) use ($type) {
-            return $phase->type === $type;
-        });
-    }
-
-    public function getNextPhaseIndex(string $operation): int
-    {
-        $found = $this->getPhases()->search(function ($phase) {
-            return $phase->type === $this->phase;
-        });
-
-        return $operation == '+' ? $found + 1 : $found - 1;
-    }
-
     public function move(string $operation)
     {
         $phase_is = [
             'required' => $this->getCurrentPhase()->required,
             'complete' => $this->getCurrentPhase()->isComplete(),
-            'last' => $this->getNextPhaseIndex('+') === $this->getPhases()->count(),
         ];
 
-        if ((($phase_is['required'] && $phase_is['complete']) ||
-        !$phase_is['required'] ||
-        $operation == '-') && !$phase_is['last']) {
+        if (
+            ($phase_is['required'] && $phase_is['complete']) ||
+            !$phase_is['required'] ||
+            $operation == '-'
+        ) {
             $this->phase = $this->getPhases()[$this->getNextPhaseIndex($operation)]->type;
-        } elseif ($phase_is['last']) {
-            $this->generatePortfolio();
         } else {
             session()->flash('message', $this->getCurrentPhase()->text);
         }
-    }
-
-    public function generatePortfolio()
-    {
-        return redirect('/portfolio');
     }
 
     public function render()

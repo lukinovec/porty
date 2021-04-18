@@ -7,7 +7,12 @@ use App\Helpers\Github;
 use Illuminate\Support\Collection;
 
 /**
- * phases stored in getPhases() method
+ * phase methods
+ * @method getPhases
+ * @method getCurrent
+ * @method getNextPhaseIndex
+ * @method findPhase
+ *
  */
 trait HasPhases
 {
@@ -18,32 +23,53 @@ trait HasPhases
 
         return collect([
             new Phase(
-                Auth::class,
-                'Log in with GitHub',
-                fn () => (bool) $github->authenticated,
-                true
+                livewire_classname: Auth::class,
+                text: 'Log in with GitHub',
+                completionCheck: fn () => (bool) $github->authenticated,
+                required: true
             ),
             new Phase(
-                Selection::class,
-                'Select projects to show',
-                fn () => (bool) $github->selected_projects,
-                true
+                livewire_classname: Selection::class,
+                text: 'Select projects to show',
+                completionCheck: fn () => (bool) $github->selected_projects,
+                required: true
             ),
             new Phase(
-                Customize::class,
-                'Customize the details',
-                fn () => (bool) $github->selection_customized
+                livewire_classname: Contact::class,
+                text: 'Give others a way to contact you',
+                completionCheck: fn () => strlen($github->contact) > 0
             ),
             new Phase(
-                Contact::class,
-                'Give others a way to contact you',
-                fn () => strlen($github->contact) > 0
+                livewire_classname: About::class,
+                text: 'Write something about yourself',
+                completionCheck: fn () => strlen($github->bio) > 0
             ),
             new Phase(
-                About::class,
-                'Write something about yourself',
-                fn () => strlen($github->bio) > 0
+                livewire_classname: Customize::class,
+                text: 'Preview and customize',
+                completionCheck: fn () => (bool) $github->selection_customized
             ),
         ]);
+    }
+
+    public function getCurrentPhase()
+    {
+        return $this->findPhase($this->phase);
+    }
+
+    public function findPhase(string $type): \App\Classes\Phase
+    {
+        return $this->getPhases()->first(function ($phase) use ($type) {
+            return $phase->type === $type;
+        });
+    }
+
+    public function getNextPhaseIndex(string $operation): int
+    {
+        $found = $this->getPhases()->search(function ($phase) {
+            return $phase->type === $this->phase;
+        });
+
+        return $operation == '+' ? $found + 1 : $found - 1;
     }
 }
