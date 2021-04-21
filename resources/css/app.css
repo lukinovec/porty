@@ -4,7 +4,7 @@
 
 @layer components {
     .btn {
-        @apply m-2 p-2 text-xl font-semibold transition duration-500 ease-in-out delay-75 transform border-2 border-black hover:scale-125 rounded-xl
+        @apply m-2 p-2 text-xl font-semibold transition duration-500 ease-in-out delay-75 transform border-2 border-colors-black hover:scale-125 rounded-xl
     }
 
     .flex-center {
@@ -12,6 +12,6 @@
     }
 
     .nav-arrow {
-        @apply w-full h-full p-1 duration-300 transform bg-opacity-50 rounded-full cursor-pointer hover:scale-125 hover:bg-gray-50
+        @apply w-full h-full p-1 duration-300 transform bg-opacity-50 rounded-full cursor-pointer hover:scale-125 hover:bg-colors-gray-50
     }
 }

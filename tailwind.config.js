@@ -1,7 +1,18 @@
+const colors = require('tailwindcss/colors')
+
 module.exports = {
     purge: [],
     darkMode: false, // or 'media' or 'class'
     theme: {
+        colors: {
+            colors,
+            figma: {
+                light: '#5458BA',
+                medium: '#4044A6',
+                dark: '#1E2281'
+            },
+
+        },
         extend: {
             transitionDuration: {
                 '0': '0ms',
