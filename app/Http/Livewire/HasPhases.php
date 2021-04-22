@@ -46,7 +46,7 @@ trait HasPhases
             ),
             new Phase(
                 livewire_classname: Customize::class,
-                text: 'Preview and customize',
+                text: 'Customize your projects',
                 completionCheck: fn () => (bool) $github->selection_customized
             ),
         ]);

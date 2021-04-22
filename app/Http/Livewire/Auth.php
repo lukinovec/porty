@@ -10,6 +10,7 @@ use Laravel\Socialite\Facades\Socialite;
 class Auth extends Component
 {
     private $github;
+
     public function mount(Github $github)
     {
         $this->github = $github;
@@ -23,7 +24,8 @@ class Auth extends Component
     public function callback()
     {
         $socialite_user = Socialite::driver('github')->user();
-        Cookie::queue(Cookie::make('socialite_user', serialize($socialite_user), 20));
+        Cookie::queue(Cookie::make('socialite_user', serialize($socialite_user), 1000));
+
         return redirect('generate?phase=selection');
     }
 

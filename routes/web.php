@@ -3,6 +3,7 @@
 use App\Http\Livewire\Auth;
 use App\Http\Livewire\Home;
 use App\Http\Livewire\Welcome;
+use App\Http\Livewire\Portfolio;
 use App\Http\Livewire\Generate;
 use App\Http\Middleware\UserExists;
 use Illuminate\Support\Facades\Route;
@@ -25,10 +26,7 @@ Route::get('/download/css', function () {
 Route::middleware([UserExists::class])->group(function () {
     Route::get('/portfolio', Home::class);
     Route::get('/generate', Generate::class);
-});
-
-Route::get('/figma', function () {
-    return view('portfolio.portfolio-template');
+    Route::get('/portfolio', Portfolio::class);
 });
 
 Route::get('/auth/redirect', [Auth::class, 'authRedirect']);

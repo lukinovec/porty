@@ -1,11 +1,10 @@
-const colors = require('tailwindcss/colors')
-
+const { colors: defaultColors } = require('tailwindcss/defaultTheme')
 module.exports = {
     purge: [],
     darkMode: false, // or 'media' or 'class'
     theme: {
         colors: {
-            colors,
+            ...defaultColors,
             figma: {
                 light: '#5458BA',
                 medium: '#4044A6',
